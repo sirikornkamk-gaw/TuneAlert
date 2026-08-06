@@ -1,4 +1,8 @@
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Song — ADT แทน "เพลง" หนึ่งเพลง
@@ -16,17 +20,39 @@ public final class Song {
     private final String artist;
     private final List<String> tags;
 
+    /**
+     *สร้างเพลงใหม่
+     * @param title คือ ชือเพลง
+     * @param artist คือ ชื่อศิลปิน
+     * @param tags คือ แนวเพลง
+     * @throws IllegalArgumentException
+     * title/artist เมื่อ null/ว่าง
+     * tags != null
+     * ห้ามมีสมาชิกเป็น null/ว่าง
+     */
     public Song(String title, String artist, List<String> tags) {
         // TODO(1.1): validate input — title/artist ห้าม null/ว่าง,
         //            tags ห้าม null และห้ามมีสมาชิกเป็น null/ว่าง
         //            ผิดเงื่อนไขให้ throw IllegalArgumentException
+        if(title  == null || title  == "") throw new IllegalArgumentException() ;
+        if(artist == null || artist  == "") throw new IllegalArgumentException() ;
+        if(tags == null) throw new IllegalArgumentException() ;
+        for (String s: tags) {
+            if(s == null|| s == "") throw new IllegalArgumentException() ;
+        }
         this.title = title;
         this.artist = artist;
         // TODO(1.2): ✗ เก็บลูกศรตรง ๆ = rep exposure ขาเข้า → defensive copy!
-        this.tags = tags;
+        this.tags = new ArrayList<>(tags);
+        checkRep();
     }
 
     // ---------- observers ----------
+    private void checkRep(){
+        assert title  != null && title  != "" ;
+        assert artist != null && artist  != "" ;
+        assert tags != null && !tags.contains(null) && !tags.contains("");
+    }
 
     public String title() {
         return title;
@@ -38,7 +64,7 @@ public final class Song {
 
     public List<String> tags() {
         // TODO(1.3): ✗ ส่งลูกศรออกไปตรง ๆ = rep exposure ขาออก → คืน "สำเนา"
-        return tags;
+        return new ArrayList<>(tags) ;
     }
 
     // ---------- producer ----------
@@ -50,8 +76,10 @@ public final class Song {
     public Song withTag(String tag) {
         // TODO(1.4): ✗ โค้ดนี้ mutate ตัวเอง! ต้องสร้างและคืน Song ตัวใหม่แทน
         //            (อย่าลืม validate tag ด้วย)
-        tags.add(tag);
-        return this;
+        if(tag == null|| tag == "") throw new IllegalArgumentException() ;
+        List<String> next = new ArrayList<>(tags) ;
+        next.add(tag);
+        return new Song(title, artist, next);
     }
 
     // ---------- equality ----------
@@ -60,9 +88,22 @@ public final class Song {
     //            เทียบ title, artist และ tags ทีละ field
     //            ตามลำดับมาตรฐาน: ตัวเอง → ชนิด (instanceof) → cast → เทียบ field
     //            ระวัง: ต้องรับ Object ไม่ใช่ Song ไม่งั้นเป็น overload ไม่ใช่ override!
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true ;
+        if(!(o instanceof Song))
+            return false ;
+        Song r = (Song) o;
+        return title.equals(r.title) && artist.equals(r.artist) && tags.equals(r.tags) ;
+    }
 
     // TODO(1.6): override hashCode() ให้สอดคล้องกับ equals
     //            (คำนวณจาก field ชุดเดียวกัน — Objects.hash(...) ช่วยได้)
+    
+    @Override
+    public int hashCode(){
+        return  Objects.hash(title,artist,tags) ;
+    }
 
     @Override
     public String toString() {
