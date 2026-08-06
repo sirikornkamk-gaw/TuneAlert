@@ -28,6 +28,7 @@ public final class Song {
      * @throws IllegalArgumentException
      * title/artist เมื่อ null/ว่าง
      * tags != null
+     * ห้ามมีสมาชิกเป็น null/ว่าง
      */
     public Song(String title, String artist, List<String> tags) {
         // TODO(1.1): validate input — title/artist ห้าม null/ว่าง,
